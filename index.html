@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pro Subscription | Liquid Glass</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Space+Grotesk:wght@500;700;900&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Outfit', 'sans-serif'], display: ['Space Grotesk', 'sans-serif'], },
+                    colors: {
+                        pro: { cyan: '#00f2fe', blue: '#4facfe', purple: '#a18cd1', gold: '#FFA301', dark: '#05050a', light: '#f0f2f5' }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Base Setup & Custom Cursor */
+        body { background-color: #f0f2f5; color: #050505; overflow-x: hidden; transition: background-color 0.5s ease; }
+        html.dark body { background-color: #05050a; color: #ffffff; }
+        * { cursor: none !important; } 
+
+        #cursor-core {
+            position: fixed; top: 0; left: 0; width: 12px; height: 12px;
+            background: #00f2fe; border-radius: 50%;
+            pointer-events: none; z-index: 9999; transform: translate(-50%, -50%);
+            box-shadow: 0 0 20px #00f2fe; transition: transform 0.1s;
+        }
+        #cursor-glass {
+            position: fixed; top: 0; left: 0; width: 50px; height: 50px;
+            border-radius: 50%; pointer-events: none; z-index: 9998;
+            backdrop-filter: blur(4px) invert(10%); border: 1px solid rgba(0, 242, 254, 0.3);
+            transform: translate(-50%, -50%); transition: width 0.3s, height 0.3s, border-color 0.3s;
+        }
+        .cursor-hover #cursor-glass {
+            width: 80px; height: 80px; border-color: #FFA301; backdrop-filter: blur(8px) invert(0%);
+        }
+        .cursor-hover #cursor-core { transform: translate(-50%, -50%) scale(0.5); background: #FFA301; }
+
+        /* Liquid Aurora Background */
+        .aurora-bg {
+            position: fixed; inset: -50%; z-index: -10; filter: blur(80px);
+            opacity: 0.6; pointer-events: none;
+        }
+        .blob { position: absolute; border-radius: 50%; mix-blend-mode: screen; animation: morph 20s infinite alternate ease-in-out; }
+        .blob-1 { width: 50vw; height: 50vw; background: rgba(0, 242, 254, 0.3); top: 20%; left: 10%; transform-origin: center center; }
+        .blob-2 { width: 40vw; height: 40vw; background: rgba(161, 140, 209, 0.3); bottom: 10%; right: 10%; transform-origin: left top; animation-delay: -5s; }
+        .blob-3 { width: 45vw; height: 45vw; background: rgba(79, 172, 254, 0.2); top: 40%; left: 40%; transform-origin: right bottom; animation-delay: -10s; }
+        
+        @keyframes morph {
+            0% { transform: scale(1) translate(0, 0) rotate(0deg); }
+            33% { transform: scale(1.2) translate(100px, 50px) rotate(45deg); }
+            66% { transform: scale(0.8) translate(-50px, 100px) rotate(90deg); }
+            100% { transform: scale(1.1) translate(-100px, -50px) rotate(180deg); }
+        }
+
+        /* SVG Gooey Filter */
+        .gooey-layer { filter: url('#goo'); position: fixed; inset: 0; z-index: -11; }
+
+        /* Smooth Cinematic Text Gradient (Fixed) */
+        .liquid-text {
+            background-size: 200% auto; color: #000;
+            background-clip: text; -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            animation: shine 6s linear infinite; transition: text-shadow 0.5s ease;
+        }
+        html.dark .liquid-text { background-image: linear-gradient(to right, #ffffff 0%, #00f2fe 25%, #a18cd1 50%, #ffffff 75%, #00f2fe 100%); }
+        html:not(.dark) .liquid-text { background-image: linear-gradient(to right, #000000 0%, #4facfe 25%, #a18cd1 50%, #000000 75%, #4facfe 100%); }
+        @keyframes shine { to { background-position: 200% center; } }
+
+        /* --- Advanced Liquid Glass Cards --- */
+        @property --angle { syntax: '<angle>'; initial-value: 0deg; inherits: false; }
+        
+        .perspective-container { perspective: 2000px; }
+        
+        .liquid-card {
+            width: 100%; height: 520px; position: relative; border-radius: 2rem;
+            transform-style: preserve-3d; transition: transform 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            background: rgba(255, 255, 255, 0.03);
+        }
+        html.dark .liquid-card { background: rgba(10, 10, 15, 0.1); }
+
+        /* Animated Glowing Border (Fixed) */
+        .liquid-card::before, .liquid-card::after {
+            content: ''; position: absolute; inset: -2px; z-index: -1; border-radius: inherit;
+            background: conic-gradient(from var(--angle), transparent 60%, #00f2fe, #a18cd1, #00f2fe);
+            animation: rotate-border 4s linear infinite; opacity: 0.5; transition: opacity 0.5s;
+        }
+        .liquid-card::after { filter: blur(20px); opacity: 0; }
+        .perspective-container:hover .liquid-card::after { opacity: 0.6; }
+        .perspective-container:hover .liquid-card::before { opacity: 1; }
+        @keyframes rotate-border { to { --angle: 360deg; } }
+
+        .perspective-container:hover .liquid-card { transform: rotateY(180deg) translateY(-10px); }
+
+        .card-face {
+            position: absolute; inset: 0; backface-visibility: hidden; -webkit-backface-visibility: hidden;
+            border-radius: inherit; overflow: hidden;
+            backdrop-filter: blur(30px) saturate(150%); -webkit-backdrop-filter: blur(30px) saturate(150%);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        /* Front Face */
+        .card-front {
+            display: flex; flex-direction: column; justify-content: flex-end; padding: 2.5rem;
+            box-shadow: inset 0 0 40px rgba(255, 255, 255, 0.05);
+        }
+        
+        /* Floating Image inside Glass */
+        .card-img-wrap {
+            position: absolute; inset: 0; z-index: -1; opacity: 0.8;
+            transform: translateZ(-20px) scale(1.05); transition: transform 0.6s, opacity 0.6s;
+        }
+        .card-img-wrap img { width: 100%; height: 100%; object-fit: cover; mask-image: linear-gradient(to top, transparent 10%, black 80%); -webkit-mask-image: linear-gradient(to top, transparent 10%, black 80%); }
+        .perspective-container:hover .card-img-wrap { opacity: 0.3; transform: translateZ(-50px) scale(1); }
+
+        /* Back Face */
+        .card-back {
+            transform: rotateY(180deg);
+            background: rgba(255, 255, 255, 0.8);
+            display: flex; flex-direction: column; justify-content: space-between; padding: 2.5rem 2rem;
+        }
+        html.dark .card-back { background: rgba(5, 5, 8, 0.7); box-shadow: inset 0 0 50px rgba(0, 242, 254, 0.1); }
+
+        /* Smooth Glass Button */
+        .btn-glass {
+            background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px); transition: all 0.3s; position: relative; overflow: hidden;
+        }
+        html.dark .btn-glass { background: rgba(0, 242, 254, 0.1); border-color: rgba(0, 242, 254, 0.3); color: white; }
+        
+        .btn-glass::before {
+            content: ''; position: absolute; inset: 0; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+            transform: translateX(-100%); transition: transform 0.6s ease;
+        }
+        .btn-glass:hover::before { transform: translateX(100%); }
+        .btn-glass:hover { background: #00f2fe; color: black; box-shadow: 0 0 30px rgba(0, 242, 254, 0.5); border-color: transparent; }
+
+    </style>
+</head>
+<body class="antialiased min-h-screen relative font-sans">
+    
+    <!-- SVG Gooey Filter definition -->
+    <svg style="position: absolute; width: 0; height: 0;">
+        <filter id="goo">
+            <feGaussianBlur in="SourceGraphic" stdDeviation="30" result="blur" />
+            <feColorMatrix in="blur" mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 30 -15" result="goo" />
+            <feBlend in="SourceGraphic" in2="goo" />
+        </filter>
+    </svg>
+
+    <!-- Liquid Background -->
+    <div class="gooey-layer">
+        <div class="aurora-bg">
+            <div class="blob blob-1"></div>
+            <div class="blob blob-2"></div>
+            <div class="blob blob-3"></div>
+        </div>
+    </div>
+
+    <!-- Dual Cursor -->
+    <div id="cursor-core"></div>
+    <div id="cursor-glass"></div>
+
+    <!-- Glass Navigation -->
+    <nav class="fixed w-full z-50 top-6 px-6">
+        <div class="max-w-6xl mx-auto rounded-3xl border border-white/20 dark:border-white/10 bg-white/30 dark:bg-black/30 backdrop-blur-2xl px-6 h-16 flex items-center justify-between shadow-[0_8px_32px_rgba(0,0,0,0.1)]">
+            <div class="flex items-center gap-3 interactive">
+                <img src="photo_2026-09-15_14-22-02.jpg" alt="Pro Subscription Logo" class="h-10 w-10 rounded-full border border-black/10 dark:border-white/20 object-cover">
+                <span class="text-xl font-display font-black tracking-widest hidden sm:block">PRO<span class="text-pro-blue">SUB</span></span>
+            </div>
+            
+            <div class="flex items-center gap-2 md:gap-4">
+                <button onclick="toggleTheme()" class="p-2 rounded-full hover:bg-black/5 dark:hover:bg-white/10 transition-colors interactive" aria-label="Toggle Theme">
+                    <svg id="theme-icon-dark" class="w-5 h-5 hidden dark:block" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+                    <svg id="theme-icon-light" class="w-5 h-5 block dark:hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path></svg>
+                </button>
+
+                <button onclick="toggleLanguage()" class="p-2 rounded-full hover:bg-black/5 dark:hover:bg-white/10 transition-colors interactive font-display font-bold tracking-widest text-pro-blue text-sm">
+                    <span id="current-lang-label">EN</span>
+                </button>
+
+                <a href="https://t.me/prosubadmin" target="_blank" class="text-sm font-black px-6 py-2.5 rounded-full btn-glass flex items-center gap-2 interactive">
+                    <span class="lang-text hidden md:inline" data-en="CONNECT" data-am="ያነጋግሩን">CONNECT</span>
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <main class="relative pt-48 pb-20 px-6 max-w-7xl mx-auto flex flex-col items-center justify-center min-h-[70vh] text-center">
+        <h1 class="text-6xl md:text-[8rem] leading-none font-display font-black tracking-tighter mb-6 relative interactive cursor-default">
+            <span class="liquid-text block lang-text" data-en="PREMIUM ACCESS." data-am="ፕሪሚየም አገልግሎቶች።">PREMIUM ACCESS.</span>
+            <span class="liquid-text block mt-2 lang-text" data-en="MAXIMUM YIELD." data-am="ከፍተኛ ጥቅም።">MAXIMUM YIELD.</span>
+        </h1>
+        
+        <p class="text-xl md:text-2xl text-black/60 dark:text-white/60 max-w-3xl mx-auto font-light lang-text interactive" data-en="Experience the fluid transition of digital infrastructure. Instant. Seamless. Pure." data-am="ከፍተኛ ደረጃ ባላቸው ዲጂታል መገልገያዎች የስራ ሂደትዎን ያሳድጉ።">
+            Experience the fluid transition of digital infrastructure. Instant. Seamless. Pure.
+        </p>
+    </main>
+
+    <!-- Liquid Glass Cards Section -->
+    <section id="products" class="py-20 px-6 max-w-7xl mx-auto">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12">
+            
+            <!-- Gemini Card -->
+            <div class="perspective-container interactive">
+                <div class="liquid-card">
+                    <div class="card-face card-front">
+                        <div class="card-img-wrap"><img src="gemini-img.png" alt="Gemini"></div>
+                        <div class="relative z-10">
+                            <span class="inline-block px-3 py-1 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-xs font-mono mb-4 text-pro-cyan">AI CORE</span>
+                            <h3 class="text-5xl font-display font-black text-black dark:text-white drop-shadow-lg">Gemini</h3>
+                        </div>
+                    </div>
+                    <div class="card-face card-back">
+                        <div>
+                            <h3 class="text-3xl font-display font-black mb-2">Gemini<br><span class="text-pro-cyan text-xl">Advanced</span></h3>
+                            <p class="text-black/60 dark:text-white/60 text-base mb-8 font-light lang-text" data-en="Next-gen neural architecture. Fluid intelligence." data-am="ለተወሳሰቡ ስራዎች፣ ኮዲንግ እና ፈጠራዎች የሚሆን የላቀ የ AI አገልግሎት።">Next-gen neural architecture. Fluid intelligence.</p>
+                            
+                            <div class="flex justify-between items-end border-b border-black/10 dark:border-white/10 pb-4 mb-8">
+                                <span class="text-sm font-bold lang-text text-pro-cyan uppercase tracking-widest" data-en="1 Month" data-am="1 ወር">1 Month</span>
+                                <span class="text-4xl font-display font-black">449 <span class="text-lg text-pro-cyan">ETB</span></span>
+                            </div>
+                        </div>
+                        <button onclick="orderProduct('Gemini Advanced', '1 Month', '1 ወር')" class="w-full py-4 rounded-2xl btn-glass font-black text-lg tracking-widest uppercase lang-text" data-en="Initialize" data-am="ለመግዛት ያነጋግሩን">
+                            Initialize
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Canva Card -->
+            <div class="perspective-container interactive">
+                <div class="liquid-card" style="--angle: 120deg;"> <!-- Offset animation starting point -->
+                    <div class="card-face card-front">
+                        <div class="card-img-wrap"><img src="canva-img.png" alt="Canva"></div>
+                        <div class="relative z-10">
+                            <span class="inline-block px-3 py-1 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-xs font-mono mb-4 text-pro-purple">CREATIVE SUITE</span>
+                            <h3 class="text-5xl font-display font-black text-black dark:text-white drop-shadow-lg">Canva</h3>
+                        </div>
+                    </div>
+                    <div class="card-face card-back">
+                        <div>
+                            <h3 class="text-3xl font-display font-black mb-2">Canva<br><span class="text-pro-purple text-xl">Enterprise</span></h3>
+                            <p class="text-black/60 dark:text-white/60 text-base mb-8 font-light lang-text" data-en="Seamless vector manipulation and brand architecture." data-am="ፕሪሚየም ቴምፕሌቶችን፣ የብራንድ ኪቶችን እና ማጂክ ሪሳይዝን ያግኙ።">Seamless vector manipulation and brand architecture.</p>
+                            
+                            <div class="flex justify-between items-end border-b border-black/10 dark:border-white/10 pb-4 mb-8">
+                                <span class="text-sm font-bold lang-text text-pro-purple uppercase tracking-widest" data-en="1 Year" data-am="1 ዓመት">1 Year</span>
+                                <span class="text-4xl font-display font-black">799<span class="text-lg text-pro-purple">ETB</span></span>
+                            </div>
+                        </div>
+                        <button onclick="orderProduct('Canva Enterprise', '1 Year', '1 ዓመት')" class="w-full py-4 rounded-2xl btn-glass font-black text-lg tracking-widest uppercase lang-text" data-en="Initialize" data-am="ለመግዛት ያነጋግሩን">
+                            Initialize
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Netflix Card -->
+            <div class="perspective-container interactive">
+                <div class="liquid-card" style="--angle: 240deg;">
+                    <div class="card-face card-front">
+                        <div class="card-img-wrap"><img src="netflix-img.png" alt="Netflix"></div>
+                        <div class="relative z-10">
+                            <span class="inline-block px-3 py-1 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-xs font-mono mb-4 text-pro-gold">STREAMING</span>
+                            <h3 class="text-5xl font-display font-black text-black dark:text-white drop-shadow-lg">Netflix</h3>
+                        </div>
+                    </div>
+                    <div class="card-face card-back">
+                        <div>
+                            <h3 class="text-3xl font-display font-black mb-2">Netflix<br><span class="text-pro-gold text-xl">Premium 4K</span></h3>
+                            <p class="text-black/60 dark:text-white/60 text-base mb-8 font-light lang-text" data-en="Ultra HD cinematic rendering. Pure immersion." data-am="በሁሉም መሣሪያዎችዎ ላይ የ Ultra HD ፊልሞች። የተጠበቀ የግል ፕሮፋይል።">Ultra HD cinematic rendering. Pure immersion.</p>
+                            
+                            <div class="flex justify-between items-end border-b border-black/10 dark:border-white/10 pb-4 mb-8">
+                                <span class="text-sm font-bold lang-text text-pro-gold uppercase tracking-widest" data-en="1 Month" data-am="1 ወር">1 Month</span>
+                                <span class="text-4xl font-display font-black">1299 <span class="text-lg text-pro-gold">ETB</span></span>
+                            </div>
+                        </div>
+                        <button onclick="orderProduct('Netflix Premium 4K', '1 Month', '1 ወር')" class="w-full py-4 rounded-2xl btn-glass font-black text-lg tracking-widest uppercase lang-text" data-en="Initialize" data-am="ለመግዛት ያነጋግሩን">
+                            Initialize
+                        </button>
+                    </div>
+                </div>
+            </div>
+             <!-- duolingo Card -->
+            <div class="perspective-container interactive">
+                <div class="liquid-card" style="--angle: 240deg;">
+                    <div class="card-face card-front">
+                        <div class="card-img-wrap"><img src="doulingo-img.png" alt="doulingo"></div>
+                        <div class="relative z-10">
+                            <span class="inline-block px-3 py-1 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-xs font-mono mb-4 text-pro-gold">EDUCATION</span>
+                            <h3 class="text-5xl font-display font-black text-black dark:text-white drop-shadow-lg">Duolingo</h3>
+                        </div>
+                    </div>
+                    <div class="card-face card-back">
+                        <div>
+                            <h3 class="text-3xl font-display font-black mb-2">Duolingo<br><span class="text-pro-gold text-xl">super</span></h3>
+                            <p class="text-black/60 dark:text-white/60 text-base mb-8 font-light lang-text" data-en="Ultra HD cinematic rendering. Pure immersion." data-am="በሁሉም መሣሪያዎችዎ ላይ የ Ultra HD ፊልሞች። የተጠበቀ የግል ፕሮፋይል።">Ultra HD cinematic rendering. Pure immersion.</p>
+                            
+                            <div class="flex justify-between items-end border-b border-black/10 dark:border-white/10 pb-4 mb-8">
+                                <span class="text-sm font-bold lang-text text-pro-gold uppercase tracking-widest" data-en="12 Month" data-am="1 ወር">12 Month</span>
+                                <span class="text-4xl font-display font-black">350 <span class="text-lg text-pro-gold">ETB</span></span>
+                            </div>
+                        </div>
+                        <button onclick="orderProduct('Duolingo Super', '12 Month', '12 ወር')" class="w-full py-4 rounded-2xl btn-glass font-black text-lg tracking-widest uppercase lang-text" data-en="Initialize" data-am="ለመግዛት ያነጋግሩን">
+                            Initialize
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <footer class="mt-20 py-10 text-center text-black/30 dark:text-white/30 text-xs font-mono uppercase tracking-widest">
+        <p>SYSTEM.COPYRIGHT © 2026 // PRO SUBSCRIPTION.</p>
+    </footer>
+
+    <script>
+        const TELEGRAM_SUPPORT_USERNAME = "prosubadmin";
+
+        // --- Fluid Cursor ---
+        const core = document.getElementById('cursor-core');
+        const glass = document.getElementById('cursor-glass');
+        const interactives = document.querySelectorAll('.interactive, button, a');
+        
+        let mouseX = window.innerWidth/2, mouseY = window.innerHeight/2;
+        let glassX = mouseX, glassY = mouseY;
+
+        document.addEventListener('mousemove', (e) => {
+            mouseX = e.clientX; mouseY = e.clientY;
+            core.style.transform = `translate3d(${mouseX}px, ${mouseY}px, 0) translate(-50%, -50%)`;
+        });
+
+        function animateGlass() {
+            glassX += (mouseX - glassX) * 0.2;
+            glassY += (mouseY - glassY) * 0.2;
+            glass.style.transform = `translate3d(${glassX}px, ${glassY}px, 0) translate(-50%, -50%)`;
+            requestAnimationFrame(animateGlass);
+        }
+        animateGlass();
+
+        interactives.forEach(el => {
+            el.addEventListener('mouseenter', () => document.body.classList.add('cursor-hover'));
+            el.addEventListener('mouseleave', () => document.body.classList.remove('cursor-hover'));
+        });
+
+        // --- Core Systems ---
+        function toggleTheme() {
+            const html = document.documentElement;
+            html.classList.toggle('dark');
+            localStorage.setItem('theme', html.classList.contains('dark') ? 'dark' : 'light');
+        }
+        if (localStorage.getItem('theme') === 'light') document.documentElement.classList.remove('dark');
+
+        let currentLang = localStorage.getItem('language') || 'en';
+        function updateLanguageDisplay() {
+            document.querySelectorAll('.lang-text').forEach(el => {
+                el.innerText = el.getAttribute(`data-${currentLang}`);
+            });
+            document.getElementById('current-lang-label').innerText = currentLang.toUpperCase();
+        }
+        function toggleLanguage() {
+            currentLang = currentLang === 'en' ? 'am' : 'en';
+            localStorage.setItem('language', currentLang);
+            updateLanguageDisplay();
+        }
+        updateLanguageDisplay();
+
+        function orderProduct(productName, durationEn, durationAm) {
+            let msg = currentLang === 'am' 
+                ? `ጤና ይስጥልኝ፣ ይህንን መግዛት እፈልጋለሁ፡\n\nአገልግሎት፡ ${productName}\nቆይታ፡ ${durationAm}\n\nእባክዎ እንዴት መክፈል እንደምችል ያሳውቁኝ።`
+                : `Hello, I would like to purchase:\n\nProduct: ${productName}\nDuration: ${durationEn}\n\nPlease let me know the payment instructions.`;
+            window.open(`https://t.me/${TELEGRAM_SUPPORT_USERNAME}?text=${encodeURIComponent(msg)}`, '_blank');
+        }
+    </script>
+</body>
+</html>
